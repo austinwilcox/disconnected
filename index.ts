@@ -91,22 +91,15 @@ const startCommand = new Command()
   });
   lines.push(`tmux select-window -t ${configFile.startingWindow}`)
   lines.push(`tmux attach -t ${name}`);
-  console.log(lines);
 
   await Deno.writeTextFile(pathToBashScriptFile, lines.join("\n"));
   await Deno.chmod(pathToBashScriptFile, 0o777);
 
-  console.log(`.${pathToBashScriptFile}`);
   const executeFile = Deno.run({ cmd: ["bash", `${pathToBashScriptFile}`] })
   await executeFile.status();
 
-  //TODO I want this to run, and then have deno clean up that bash script that I have written
-  //so that it's created each time that I call the start function
-  // const p = Deno.run({ cmd: ["tmux", "attach", "-t", name] })
-  // await p.status();
-
   console.log("Run following command to attach to tmux.");
-  console.log(`tmux attach -t ${name}`);
+  console.log(`tmux a -t ${name}`);
 
 })
 
@@ -172,16 +165,6 @@ const editConfigCommand = new Command()
 
   const p = Deno.run({ cmd: ["nvim", `${basePathToDisconnectedDirectory}/${name}.json`] })
   await p.status();
-  console.log(`You have hit the edit command with ${name}`)
-})
-
-const testCommand = new Command()
-.description("Test")
-.action(async ( _options ) => {
-  //note
-  //This opens up nvim in the current shell session, and then gives control back to deno once you have exited nvim
-  const p = Deno.run({ cmd: ["nvim", "."] });
-  await p.status();
 })
 
 await new Command()
@@ -197,5 +180,4 @@ await new Command()
 .command("new", createNewConfigCommand)
 .command("delete", deleteConfigCommand)
 .command("edit", editConfigCommand)
-.command("test", testCommand)
 .parse(Deno.args);
