@@ -1,0 +1,19 @@
+{
+  "name": "SampleBaseConfig",
+  "basePath": "~/",
+  "startingWindow": "1",
+  "windows": [
+    {
+      "name": "listfiles",
+      "basePath": "",
+      "commands": ["ls"],
+      "shouldCloseAfterCommand": false
+    },
+    {
+      "name": "top",
+      "basePath": "",
+      "commands": ["top"],
+      "shouldCloseAfterCommand": true
+    }
+  ]
+}
