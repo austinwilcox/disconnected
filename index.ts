@@ -45,7 +45,7 @@ const initCommand = new Command()
 
 const startCommand = new Command()
 .arguments("<name:string>")
-.description("Start tmux with the config file, note this will not attach to the tmux session.")
+.description("Start tmux with the config file.")
 .action(async ( _options, name: string ) => {
   const pathToBashScriptFile = `${basePathToDisconnectedDirectory}/bashScripts/${name}.sh`;
 
