@@ -2,7 +2,8 @@ import { Command } from "https://deno.land/x/cliffy@v0.25.2/command/mod.ts";
 import * as path from "https://deno.land/std@0.167.0/path/mod.ts";
 import { createNeededDirectoriesAndFiles } from "./startup.ts";
 
-const basePathToDisconnectedDirectory = "/home/austin/.config/disconnected";
+const home = Deno.env.get("HOME");
+const basePathToDisconnectedDirectory = `${home}/.config/disconnected`;
 
 interface IWindow {
   name: string;
