@@ -170,7 +170,7 @@ const editConfigCommand = new Command()
 
 await new Command()
 .name("Disconnected")
-.version("0.1.0")
+.version("0.1.1`")
 .description("Disconnected is a tmux session application. Similiar to tmuxinator but written in Deno, and it uses JSON for its configuration instead of yaml.")
 .action((_options, ...args) => {
   console.log(`Disconnected solo command. This will do nothing right now.`);
