@@ -62,10 +62,10 @@ basePath: This will be the base path for your project you are working in.
 startingWindow: The default option is 1, in my tmux config I do 1-9, and I don't use 0. This is my opinionated config for tmux.
 
 windows:
-  name: Name of the tmux window
-  basePath: This will build on basePath from the parent, so if your basePath in the parent is "~/Software" this one could drill down into the tools folder by suppying "tools" as the option here.
-  commands: A series of shell commands that you want run in that window.
-  shouldCloseAfterCommand: tells tmux whether or not to close the window after the commands are complete.
+>  name: Name of the tmux window
+>  basePath: This will build on basePath from the parent, so if your basePath in the parent is "~/Software" this one could drill down into the tools folder by suppying "tools" as the option here.
+>  commands: A series of shell commands that you want run in that window.
+>  shouldCloseAfterCommand: tells tmux whether or not to close the window after the commands are complete.
   TODO Support panes in the future.
   
 ## TODO
