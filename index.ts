@@ -24,12 +24,6 @@ const baseConfigFile = `{
       "shouldCloseAfterCommand": false
     },
     {
-      "name": "tree",
-      "basePath": "",
-      "commands": ["tree"],
-      "shouldCloseAfterCommand": false
-    },
-    {
       "name": "htop",
       "basePath": "",
       "commands": ["htop"],
@@ -46,7 +40,7 @@ const initCommand = new Command()
 
 const startCommand = new Command()
 .arguments("<name:string>")
-.description("Start tmux with the config file.")
+.description("Start tmux with the supplied config file name.")
 .action(async ( _options, name: string ) => {
   const pathToBashScriptFile = `${basePathToDisconnectedDirectory}/bashScripts/${name}.sh`;
 
@@ -101,7 +95,6 @@ const startCommand = new Command()
 
   console.log("Run following command to attach to tmux.");
   console.log(`tmux a -t ${name}`);
-
 })
 
 const listCommand = new Command()
@@ -170,10 +163,12 @@ const editConfigCommand = new Command()
 
 await new Command()
 .name("Disconnected")
-.version("0.1.1`")
-.description("Disconnected is a tmux session application. Similiar to tmuxinator but written in Deno, and it uses JSON for its configuration instead of yaml.")
-.action((_options, ...args) => {
-  console.log(`Disconnected solo command. This will do nothing right now.`);
+.version("0.1.2`")
+.description(`Disconnected is a powerful and versatile application that allows you to manage your terminal sessions with ease. As an alternative to tmuxinator, it offers a simple and intuitive cli that is perfect for both beginners and advanced users. With Disconnected, you can easily create, modify, and manage your terminal sessions with just a few commands.
+
+One of the key features of Disconnected is its use of a JSON configuration file, which makes it easy to configure and customize your terminal sessions to your liking. Whether you're working on a complex project or just need to manage a few terminals at once, Disconnected makes it easy to get started.`)
+.action(async (_options, ...args) => {
+  await createNeededDirectoriesAndFiles(basePathToDisconnectedDirectory, baseConfigFile);
 })
 .command("init", initCommand)
 .command("start", startCommand)
