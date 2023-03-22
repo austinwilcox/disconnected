@@ -4,6 +4,7 @@ import { createNeededDirectoriesAndFiles } from "./startup.ts";
 
 const home = Deno.env.get("HOME");
 const basePathToDisconnectedDirectory = `${home}/.config/disconnected`;
+const editor = Deno.env.get("EDITOR")
 
 interface IWindow {
   name: string;
@@ -31,6 +32,10 @@ const baseConfigFile = `{
     }
   ]
 }`
+
+const testCommand = new Command()
+.description(`TEST`)
+.action(async () => { })
 
 const initCommand = new Command()
 .description(`Create all the files and folders needed to run disconnected. Files will be placed in ${basePathToDisconnectedDirectory}`)
@@ -128,7 +133,7 @@ const createNewConfigCommand = new Command()
   Deno.writeFileSync(`${basePathToDisconnectedDirectory}/${name}.json`, data)
   console.log("File created, opening in neovim");
 
-  const p = Deno.run({ cmd: ["nvim", `${basePathToDisconnectedDirectory}/${name}.json`] })
+  const p = Deno.run({ cmd: [editor, `${basePathToDisconnectedDirectory}/${name}.json`] })
   await p.status();
 })
 
@@ -157,13 +162,13 @@ const editConfigCommand = new Command()
     return;
   }
 
-  const p = Deno.run({ cmd: ["nvim", `${basePathToDisconnectedDirectory}/${name}.json`] })
+  const p = Deno.run({ cmd: [editor, `${basePathToDisconnectedDirectory}/${name}.json`] })
   await p.status();
 })
 
 await new Command()
 .name("Disconnected")
-.version("0.1.2`")
+.version("0.2.2`")
 .description(`Disconnected is a powerful and versatile application that allows you to manage your terminal sessions with ease. As an alternative to tmuxinator, it offers a simple and intuitive cli that is perfect for both beginners and advanced users. With Disconnected, you can easily create, modify, and manage your terminal sessions with just a few commands.
 
 One of the key features of Disconnected is its use of a JSON configuration file, which makes it easy to configure and customize your terminal sessions to your liking. Whether you're working on a complex project or just need to manage a few terminals at once, Disconnected makes it easy to get started.`)
@@ -176,4 +181,5 @@ One of the key features of Disconnected is its use of a JSON configuration file,
 .command("new", createNewConfigCommand)
 .command("delete", deleteConfigCommand)
 .command("edit", editConfigCommand)
+// .command("test", testCommand)
 .parse(Deno.args);
