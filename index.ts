@@ -4,7 +4,10 @@ import { createNeededDirectoriesAndFiles } from "./startup.ts";
 
 const home = Deno.env.get("HOME");
 const basePathToDisconnectedDirectory = `${home}/.config/disconnected`;
-const editor = Deno.env.get("EDITOR")
+let editor = Deno.env.get("EDITOR")
+if (!editor) {
+  editor = "nano"
+}
 
 interface IWindow {
   name: string;
@@ -133,7 +136,7 @@ const createNewConfigCommand = new Command()
   Deno.writeFileSync(`${basePathToDisconnectedDirectory}/${name}.json`, data)
   console.log("File created, opening in neovim");
 
-  const p = Deno.run({ cmd: [editor, `${basePathToDisconnectedDirectory}/${name}.json`] })
+  const p = Deno.run({ cmd: [editor as string, `${basePathToDisconnectedDirectory}/${name}.json`] })
   await p.status();
 })
 
@@ -162,7 +165,7 @@ const editConfigCommand = new Command()
     return;
   }
 
-  const p = Deno.run({ cmd: [editor, `${basePathToDisconnectedDirectory}/${name}.json`] })
+  const p = Deno.run({ cmd: [editor as string, `${basePathToDisconnectedDirectory}/${name}.json`] })
   await p.status();
 })
 
