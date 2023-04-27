@@ -36,6 +36,18 @@ const baseConfigFile = `{
   ]
 }`
 
+async function isTmuxSessionCurrentlyRunning(nameOfConfig: string): Promise<boolean> {
+  try {
+    const tmuxLsCommand = Deno.run({ cmd: ["tmux", 'ls'], stdout: 'piped' })
+    await tmuxLsCommand.status();
+    const decodedText = new TextDecoder().decode(await tmuxLsCommand.output());
+    return decodedText.includes(nameOfConfig)
+  } catch(err) {
+    console.error(err);
+    return false
+  }
+}
+
 const testCommand = new Command()
 .description(`TEST`)
 .action(async () => { })
@@ -65,6 +77,13 @@ const startCommand = new Command()
     console.log(`Did you mean to run: disconnected new ${name}?`);
     return;
   }
+
+  if (await isTmuxSessionCurrentlyRunning(name)) {
+    const tmuxAttachStatus = Deno.run({ cmd: [`tmux`, 'attach', '-t', name]});
+    await tmuxAttachStatus.status();
+    return;
+  }
+
   const decoder = new TextDecoder("utf-8");
   const file = await Deno.readFile(`${basePathToDisconnectedDirectory}/${name}.json`);
 
@@ -98,7 +117,7 @@ const startCommand = new Command()
   await Deno.writeTextFile(pathToBashScriptFile, lines.join("\n"));
   await Deno.chmod(pathToBashScriptFile, 0o777);
 
-  const executeFile = Deno.run({ cmd: ["bash", `${pathToBashScriptFile}`] })
+  const executeFile = Deno.run({ cmd: [Deno.env.get("SHELL"), `${pathToBashScriptFile}`] })
   await executeFile.status();
 
   console.log("Run following command to attach to tmux.");
