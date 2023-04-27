@@ -117,7 +117,7 @@ const startCommand = new Command()
   await Deno.writeTextFile(pathToBashScriptFile, lines.join("\n"));
   await Deno.chmod(pathToBashScriptFile, 0o777);
 
-  const executeFile = Deno.run({ cmd: [Deno.env.get("SHELL"), `${pathToBashScriptFile}`] })
+  const executeFile = Deno.run({ cmd: [Deno.env.get("SHELL") as string, `${pathToBashScriptFile}`] })
   await executeFile.status();
 
   console.log("Run following command to attach to tmux.");
