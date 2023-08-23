@@ -151,7 +151,8 @@ const createNewConfigCommand = new Command()
   }
   
   const encoder = new TextEncoder();
-  const data = encoder.encode(baseConfigFile)
+  const newConfigFile = baseConfigFile.replace(/SampleBaseConfig/gi, name);
+  const data = encoder.encode(newConfigFile)
   Deno.writeFileSync(`${basePathToDisconnectedDirectory}/${name}.json`, data)
   console.log("File created, opening in neovim");
 
