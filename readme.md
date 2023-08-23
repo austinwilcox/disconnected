@@ -68,7 +68,7 @@ windows:
 *  shouldCloseAfterCommand: tells tmux whether or not to close the window after the commands are complete.
   
 ## TODO
-- [ ] Update this so that the name auto defaults to the name of the file.
+- [x] Update this so that the name auto defaults to the name of the file.
 - [ ] Support panes in the future.
 - [ ] Do some name validation here to ensure no spaces are in the name
 - [ ] Improve the text validation for attaching to a service that has already been started (currently it's a simple includes)
