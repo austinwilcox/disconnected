@@ -1,6 +1,7 @@
 import { Command } from "https://deno.land/x/cliffy@v0.25.2/command/mod.ts";
 import * as path from "https://deno.land/std@0.167.0/path/mod.ts";
 import { createNeededDirectoriesAndFiles } from "./startup.ts";
+import { isTmuxSessionCurrentlyRunning } from "./utils.ts";
 
 const home = Deno.env.get("HOME");
 const basePathToDisconnectedDirectory = `${home}/.config/disconnected`;
@@ -35,18 +36,6 @@ const baseConfigFile = `{
     }
   ]
 }`
-
-async function isTmuxSessionCurrentlyRunning(nameOfConfig: string): Promise<boolean> {
-  try {
-    const tmuxLsCommand = Deno.run({ cmd: ["tmux", 'ls'], stdout: 'piped' })
-    await tmuxLsCommand.status();
-    const decodedText = new TextDecoder().decode(await tmuxLsCommand.output());
-    return decodedText.includes(nameOfConfig)
-  } catch(err) {
-    console.error(err);
-    return false
-  }
-}
 
 const testCommand = new Command()
 .description(`TEST`)
