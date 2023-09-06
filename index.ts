@@ -70,6 +70,7 @@ const startCommand = new Command()
 
   if (await isTmuxSessionCurrentlyRunning(Tmux, name)) {
     await Tmux.attach(name);
+    return;
   }
 
   const decoder = new TextDecoder("utf-8");

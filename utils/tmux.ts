@@ -15,6 +15,5 @@ export const Tmux: ITmux = {
   attach: async (name: string) => {
     const attachCommand = new Deno.Command("tmux", { args: ["attach", "-t", name]});
     attachCommand.spawn();
-    return;
   }
 }
