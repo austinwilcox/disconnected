@@ -1,6 +1,8 @@
 import { Command } from "https://deno.land/x/cliffy@v0.25.2/command/mod.ts";
 import * as path from "https://deno.land/std@0.167.0/path/mod.ts";
 import { createNeededDirectoriesAndFiles } from "./startup.ts";
+import { isTmuxSessionCurrentlyRunning } from "./utils/index.ts";
+import { Tmux } from "./utils/tmux.ts"
 
 const home = Deno.env.get("HOME");
 const basePathToDisconnectedDirectory = `${home}/.config/disconnected`;
@@ -36,19 +38,7 @@ const baseConfigFile = `{
   ]
 }`
 
-async function isTmuxSessionCurrentlyRunning(nameOfConfig: string): Promise<boolean> {
-  try {
-    const tmuxLsCommand = Deno.run({ cmd: ["tmux", 'ls'], stdout: 'piped' })
-    await tmuxLsCommand.status();
-    const decodedText = new TextDecoder().decode(await tmuxLsCommand.output());
-    return decodedText.includes(nameOfConfig)
-  } catch(err) {
-    console.error(err);
-    return false
-  }
-}
-
-const testCommand = new Command()
+const _testCommand = new Command()
 .description(`TEST`)
 .action(async () => { })
 
@@ -78,9 +68,8 @@ const startCommand = new Command()
     return;
   }
 
-  if (await isTmuxSessionCurrentlyRunning(name)) {
-    const tmuxAttachStatus = Deno.run({ cmd: [`tmux`, 'attach', '-t', name]});
-    await tmuxAttachStatus.status();
+  if (await isTmuxSessionCurrentlyRunning(Tmux, name)) {
+    await Tmux.attach(name);
     return;
   }
 
@@ -191,7 +180,7 @@ const editConfigCommand = new Command()
 
 await new Command()
 .name("Disconnected")
-.version("0.2.1")
+.version("0.2.2")
 .description(`Disconnected is a powerful and versatile application that allows you to manage your terminal sessions with ease. As an alternative to tmuxinator, it offers a simple and intuitive cli that is perfect for both beginners and advanced users. With Disconnected, you can easily create, modify, and manage your terminal sessions with just a few commands.
 
 One of the key features of Disconnected is its use of a JSON configuration file, which makes it easy to configure and customize your terminal sessions to your liking. Whether you're working on a complex project or just need to manage a few terminals at once, Disconnected makes it easy to get started.`)

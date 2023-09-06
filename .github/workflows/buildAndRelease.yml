@@ -29,6 +29,9 @@ jobs:
         uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31  # v1.1.2
         with:
           deno-version: v1.26
+
+      - name: Tests
+        run: deno test
       
       - name: Build Deno App
         run: deno compile --allow-read --allow-env --allow-write --allow-run --output ./dist/disconnected index.ts
@@ -39,10 +42,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
-          tag_name: v0.2.1 # Replace with your desired tag name
-          release_name: Release 0.2.1 # Replace with your desired release name
+          tag_name: v0.2.2 # Replace with your desired tag name
+          release_name: Release 0.2.2 # Replace with your desired release name
           body: |
-            Adding Github actions for bundling the application
+            Fixed [issue](https://github.com/austinwilcox/disconnected/issues/5) with error message appearing when no active tmux sessions are running.
+
+            I have also added some basic tests and an interface for some of the tmux commands, these tests will also run as part of the build and release process.
           draft: false
           prerelease: false
           
