@@ -6,6 +6,9 @@ import { assert } from "https://deno.land/std@0.201.0/assert/assert.ts";
 const tmuxTest: ITmux = {
   listSessions: async() => {
     return "testOutput"
+  },
+  attach: async(name: string) => {
+    console.log(`${name}`);
   }
 }
 
