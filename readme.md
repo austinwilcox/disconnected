@@ -7,7 +7,7 @@ Disconnected is a constantly updated program, it is fully functional in it's 0.2
 
 ## Setup
 1. To setup Disconnected, ensure that you have [Deno](https://deno.land/manual@v1.31.1/getting_started/installation) installed on your machine.
-NOTE: Disconnected will only work on Mac or Linux, and ~~ currently only works for NVIM users~~ now works for all users who have the $EDITOR env variable set.
+NOTE: Disconnected will only work on Mac or Linux, and ~~currently only works for NVIM users~~ now works for all users who have the $EDITOR env variable set.
 2. Run the compile.sh script
 3. This will generate a disconnected executable that you can run on your machine. You can add this directory to your path, or toss it in the bin folder with your shell.
 ```bash

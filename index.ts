@@ -2,6 +2,7 @@ import { Command } from "https://deno.land/x/cliffy@v0.25.2/command/mod.ts";
 import * as path from "https://deno.land/std@0.167.0/path/mod.ts";
 import { createNeededDirectoriesAndFiles } from "./startup.ts";
 import { isTmuxSessionCurrentlyRunning } from "./utils.ts";
+import { Tmux } from "./utils/tmux.ts"
 
 const home = Deno.env.get("HOME");
 const basePathToDisconnectedDirectory = `${home}/.config/disconnected`;
@@ -37,7 +38,7 @@ const baseConfigFile = `{
   ]
 }`
 
-const testCommand = new Command()
+const _testCommand = new Command()
 .description(`TEST`)
 .action(async () => { })
 
@@ -67,10 +68,8 @@ const startCommand = new Command()
     return;
   }
 
-  if (await isTmuxSessionCurrentlyRunning(name)) {
-    const tmuxAttachStatus = Deno.run({ cmd: [`tmux`, 'attach', '-t', name]});
-    await tmuxAttachStatus.status();
-    return;
+  if (await isTmuxSessionCurrentlyRunning(Tmux, name)) {
+    await Tmux.attach(name);
   }
 
   const decoder = new TextDecoder("utf-8");
