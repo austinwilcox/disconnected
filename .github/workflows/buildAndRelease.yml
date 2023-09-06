@@ -13,7 +13,7 @@ on:
     branches: ["master"]
 
 jobs:
-  test:
+  buildAndRun:
     runs-on: ubuntu-latest
 
     permissions:
@@ -31,7 +31,7 @@ jobs:
           deno-version: v1.26
       
       - name: Build Deno App
-        run: deno compile --allow-read --allow-env --allow-write --allow-run --output disconnected index.ts
+        run: deno compile --allow-read --allow-env --allow-write --allow-run --output ./dist/disconnected index.ts
       
       - name: Create Release
         id: create_release
@@ -53,6 +53,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./
+          asset_path: ./dist/disconnected
           asset_name: disconnected
           asset_content_type: application/octet-stream
