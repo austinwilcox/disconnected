@@ -44,14 +44,6 @@ const baseConfigFile = `{
 //const testCommand = new Command()
 //.description(`TEST`)
 //.action(() => {
-//  //get the home directory
-//  const home = Deno.env.get("HOME");
-//  let dir = "~/.dotfiles";
-//  if(dir.includes("~")) {
-//    dir = dir.replace("~", home as string)
-//  }
-//  Deno.readDir(dir)
-//  console.log(dir);
 //})
 
 const initCommand = new Command()

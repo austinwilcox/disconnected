@@ -42,12 +42,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
-          tag_name: v0.2.2 # Replace with your desired tag name
-          release_name: Release 0.2.2 # Replace with your desired release name
+          tag_name: v0.3.0 # Replace with your desired tag name
+          release_name: Release 0.3.0 # Replace with your desired release name
           body: |
-            Fixed [issue](https://github.com/austinwilcox/disconnected/issues/5) with error message appearing when no active tmux sessions are running.
+            Fix Deno.run to Deno.Command as Deno.run is being deprecated. I have resolved the issue where you supply the global basePath as ~/ and the window basePath as ~/ by adding a new key in the json structure called concatenateBasePathToGlobalBasePath. This will prevent issues such as cd ~/~/ being run in the window. 
 
-            I have also added some basic tests and an interface for some of the tmux commands, these tests will also run as part of the build and release process.
+            Window basePaths can now use relative paths.
+
+            When you attach to the session the -c command is attached which will instantiate all new windows to the global basePath directory you specify in the config file.
           draft: false
           prerelease: false
           
