@@ -7,13 +7,15 @@
       "name": "listfiles",
       "basePath": "",
       "commands": ["ls"],
-      "shouldCloseAfterCommand": false
+      "shouldCloseAfterCommand": false,
+      "concatenateBasePathToGlobalBasePath": false
     },
     {
       "name": "top",
       "basePath": "",
       "commands": ["top"],
-      "shouldCloseAfterCommand": true
+      "shouldCloseAfterCommand": true,
+      "concatenateBasePathToGlobalBasePath": false
     }
   ]
 }

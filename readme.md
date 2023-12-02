@@ -35,6 +35,12 @@ with nameOfService being whatever you would like to call the config file
 TODO Do some name validation here to ensure no spaces are in the name
 5. You'll be presented with a json file in your editor of choice that you can modify and edit to setup your sessions.
 
+## Build from source
+```
+deno compile --allow-read --allow-env --allow-write --allow-run --output ./dist/disconnected index.ts
+chmod +x ./dist/disconnected
+```
+
 ## The Config File
 Here is the sample config file that is generated for you
 ```

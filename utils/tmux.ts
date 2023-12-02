@@ -1,6 +1,6 @@
 export interface ITmux {
   listSessions: () => Promise<string>;
-  attach: (name: string) => Promise<void>;
+  attach: (name: string) => void;
 }
 
 export const Tmux: ITmux = {
@@ -12,7 +12,7 @@ export const Tmux: ITmux = {
     return decodedText;
   },
 
-  attach: async (name: string) => {
+  attach: (name: string) => {
     const attachCommand = new Deno.Command("tmux", { args: ["attach", "-t", name]});
     attachCommand.spawn();
   }

@@ -16,6 +16,7 @@ interface IWindow {
   basePath: string;
   commands: string[];
   shouldCloseAfterCommand: boolean;
+  concatenateBasePathToGlobalBasePath: boolean;
 }
 
 const baseConfigFile = `{
@@ -27,20 +28,31 @@ const baseConfigFile = `{
       "name": "listfiles",
       "basePath": "",
       "commands": ["ls"],
-      "shouldCloseAfterCommand": false
+      "shouldCloseAfterCommand": false,
+      "concatenateBasePathToGlobalBasePath": false
     },
     {
       "name": "htop",
       "basePath": "",
       "commands": ["htop"],
-      "shouldCloseAfterCommand": true
+      "shouldCloseAfterCommand": true,
+      "concatenateBasePathToGlobalBasePath": false
     }
   ]
 }`
 
-const _testCommand = new Command()
+const testCommand = new Command()
 .description(`TEST`)
-.action(async () => { })
+.action(() => {
+  //get the home directory
+  const home = Deno.env.get("HOME");
+  let dir = "~/.dotfiles";
+  if(dir.includes("~")) {
+    dir = dir.replace("~", home as string)
+  }
+  Deno.readDir(dir)
+  console.log(dir);
+})
 
 const initCommand = new Command()
 .description(`Create all the files and folders needed to run disconnected. Files will be placed in ${basePathToDisconnectedDirectory}`)
@@ -69,7 +81,7 @@ const startCommand = new Command()
   }
 
   if (await isTmuxSessionCurrentlyRunning(Tmux, name)) {
-    await Tmux.attach(name);
+    Tmux.attach(name);
     return;
   }
 
@@ -81,6 +93,12 @@ const startCommand = new Command()
   const lines = [];
   const paneNumber = 1;
   configFile.windows.forEach((window: IWindow, index: number) => {
+    if (configFile.basePath.includes("~")) {
+      configFile.basePath = configFile.basePath.replace("~", home as string)
+    }
+    if (window.basePath.includes("~")) {
+      window.basePath = window.basePath.replace("~", home as string)
+    }
     const windowNumber = index + 1;
     if (index === 0) {
       lines.push(`tmux new-session -d -s ${name} -n ${window.name}`);
@@ -88,9 +106,15 @@ const startCommand = new Command()
       lines.push(`tmux neww -t ${name} -n "${window.name}"`);
     }
 
-    lines.push(
-      `tmux send -t ${name}:${windowNumber}.${paneNumber} "cd ${path.join(configFile.basePath, window.basePath)}" C-m`
-    );
+    if(window.concatenateBasePathToGlobalBasePath) {
+      lines.push(
+        `tmux send -t ${name}:${windowNumber}.${paneNumber} "cd ${path.join(configFile.basePath, window.basePath)}" C-m`
+      );
+    } else {
+      lines.push(
+        `tmux send -t ${name}:${windowNumber}.${paneNumber} "cd ${window.basePath}" C-m`
+      )
+    }
 
     window.commands.forEach((cmd: string) => {
       lines.push(`tmux send -t ${name}:${windowNumber}.${paneNumber} "${cmd}" C-m`);
@@ -101,13 +125,13 @@ const startCommand = new Command()
     }
   });
   lines.push(`tmux select-window -t ${configFile.startingWindow}`)
-  lines.push(`tmux attach -t ${name}`);
+  lines.push(`tmux attach -t ${name} -c ${configFile.basePath}`);
 
   await Deno.writeTextFile(pathToBashScriptFile, lines.join("\n"));
   await Deno.chmod(pathToBashScriptFile, 0o777);
 
-  const executeFile = Deno.run({ cmd: [Deno.env.get("SHELL") as string, `${pathToBashScriptFile}`] })
-  await executeFile.status();
+  const executeFile = new Deno.Command(Deno.env.get("SHELL") as string, { args: [`${pathToBashScriptFile}`] });
+  executeFile.spawn();
 
   console.log("Run following command to attach to tmux.");
   console.log(`tmux a -t ${name}`);
@@ -145,16 +169,16 @@ const createNewConfigCommand = new Command()
   Deno.writeFileSync(`${basePathToDisconnectedDirectory}/${name}.json`, data)
   console.log("File created, opening in neovim");
 
-  const p = Deno.run({ cmd: [editor as string, `${basePathToDisconnectedDirectory}/${name}.json`] })
-  await p.status();
+  const p = new Deno.Command(editor as string, { args: [`${basePathToDisconnectedDirectory}/${name}.json`] });
+  p.spawn();
 })
 
-const deleteConfigCommand = new Command()
-.arguments("<name:string>")
-.description("Delete the config file")
-.action(( _options, name: string ) => {
-  console.log(`You have hit the delete command with ${name}`)
-})
+// const deleteConfigCommand = new Command()
+// .arguments("<name:string>")
+// .description("Delete the config file")
+// .action(( _options, name: string ) => {
+//   console.log(`You have hit the delete command with ${name}`)
+// })
 
 const editConfigCommand = new Command()
 .arguments("<name:string>")
@@ -174,13 +198,13 @@ const editConfigCommand = new Command()
     return;
   }
 
-  const p = Deno.run({ cmd: [editor as string, `${basePathToDisconnectedDirectory}/${name}.json`] })
-  await p.status();
+  const p = new Deno.Command(editor as string, { args: [`${basePathToDisconnectedDirectory}/${name}.json`] });
+  p.spawn();
 })
 
 await new Command()
 .name("Disconnected")
-.version("0.2.2")
+.version("0.3.0")
 .description(`Disconnected is a powerful and versatile application that allows you to manage your terminal sessions with ease. As an alternative to tmuxinator, it offers a simple and intuitive cli that is perfect for both beginners and advanced users. With Disconnected, you can easily create, modify, and manage your terminal sessions with just a few commands.
 
 One of the key features of Disconnected is its use of a JSON configuration file, which makes it easy to configure and customize your terminal sessions to your liking. Whether you're working on a complex project or just need to manage a few terminals at once, Disconnected makes it easy to get started.`)
@@ -191,7 +215,7 @@ One of the key features of Disconnected is its use of a JSON configuration file,
 .command("start", startCommand)
 .command("list", listCommand)
 .command("new", createNewConfigCommand)
-.command("delete", deleteConfigCommand)
+// .command("delete", deleteConfigCommand)
 .command("edit", editConfigCommand)
-// .command("test", testCommand)
+.command("test", testCommand)
 .parse(Deno.args);
