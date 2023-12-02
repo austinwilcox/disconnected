@@ -41,18 +41,18 @@ const baseConfigFile = `{
   ]
 }`
 
-const testCommand = new Command()
-.description(`TEST`)
-.action(() => {
-  //get the home directory
-  const home = Deno.env.get("HOME");
-  let dir = "~/.dotfiles";
-  if(dir.includes("~")) {
-    dir = dir.replace("~", home as string)
-  }
-  Deno.readDir(dir)
-  console.log(dir);
-})
+//const testCommand = new Command()
+//.description(`TEST`)
+//.action(() => {
+//  //get the home directory
+//  const home = Deno.env.get("HOME");
+//  let dir = "~/.dotfiles";
+//  if(dir.includes("~")) {
+//    dir = dir.replace("~", home as string)
+//  }
+//  Deno.readDir(dir)
+//  console.log(dir);
+//})
 
 const initCommand = new Command()
 .description(`Create all the files and folders needed to run disconnected. Files will be placed in ${basePathToDisconnectedDirectory}`)
@@ -208,7 +208,7 @@ await new Command()
 .description(`Disconnected is a powerful and versatile application that allows you to manage your terminal sessions with ease. As an alternative to tmuxinator, it offers a simple and intuitive cli that is perfect for both beginners and advanced users. With Disconnected, you can easily create, modify, and manage your terminal sessions with just a few commands.
 
 One of the key features of Disconnected is its use of a JSON configuration file, which makes it easy to configure and customize your terminal sessions to your liking. Whether you're working on a complex project or just need to manage a few terminals at once, Disconnected makes it easy to get started.`)
-.action(async (_options, ...args) => {
+.action(async (_options, ..._args) => {
   await createNeededDirectoriesAndFiles(basePathToDisconnectedDirectory, baseConfigFile);
 })
 .command("init", initCommand)
@@ -217,5 +217,5 @@ One of the key features of Disconnected is its use of a JSON configuration file,
 .command("new", createNewConfigCommand)
 // .command("delete", deleteConfigCommand)
 .command("edit", editConfigCommand)
-.command("test", testCommand)
+// .command("test", testCommand)
 .parse(Deno.args);
