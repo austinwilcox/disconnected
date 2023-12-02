@@ -32,8 +32,14 @@ This will create the necessary folders and files in the ~/.config/disconnected f
 disconnected new NameOfService
 ```
 with nameOfService being whatever you would like to call the config file
-TODO Do some name validation here to ensure no spaces are in the name
+<!-- TODO: Do some name validation here to ensure no spaces are in the name -->
 5. You'll be presented with a json file in your editor of choice that you can modify and edit to setup your sessions.
+
+## Build from source
+```
+deno compile --allow-read --allow-env --allow-write --allow-run --output ./dist/disconnected index.ts
+chmod +x ./dist/disconnected
+```
 
 ## The Config File
 Here is the sample config file that is generated for you
@@ -47,19 +53,21 @@ Here is the sample config file that is generated for you
       "name": "listfiles",
       "basePath": "",
       "commands": ["ls"],
-      "shouldCloseAfterCommand": false
+      "shouldCloseAfterCommand": false,
+      "concatenateBasePathToGlobalBasePath": false
     },
     {
       "name": "htop",
       "basePath": "",
       "commands": ["htop"],
-      "shouldCloseAfterCommand": true
+      "shouldCloseAfterCommand": true,
+      "concatenateBasePathToGlobalBasePath": false
     }
   ]
 }
 ```
 name: This will be the name of the tmux session 
-TODO Update this so that the name auto defaults to the name of the file.
+<!-- TODO: Update this so that the name auto defaults to the name of the file. -->
 
 basePath: This will be the base path for your project you are working in.
 

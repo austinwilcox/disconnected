@@ -1,14 +1,13 @@
 import { assertEquals } from "https://deno.land/std@0.201.0/assert/mod.ts";
 import { ITmux } from "./tmux.ts";
 import { isTmuxSessionCurrentlyRunning } from "./index.ts";
-import { assert } from "https://deno.land/std@0.201.0/assert/assert.ts";
 
 const tmuxTest: ITmux = {
-  listSessions: async() => {
-    return "testOutput"
+  listSessions: async () => {
+    return await Promise.resolve("testOutput");
   },
-  attach: async(name: string) => {
-    console.log(`${name}`);
+  attach: async (name: string) => {
+    await Promise.resolve(console.log(`${name}`));
   }
 }
 
