@@ -75,7 +75,7 @@ startingWindow: The default option is 1, in my tmux config I do 1-9, and I don't
 
 windows:
 *  name: Name of the tmux window
-*  basePath: This will build on basePath from the parent, so if your basePath in the parent is "~/Software" this one could drill down into the tools folder by suppying "tools" as the option here.
+*  basePath: This ***may*** build on the global basePath, so if your basePath that is set globally is ```~/Software``` this one could drill down into the tools folder by suppyling ```tools``` as the option here. With the concatenateBasePathToGlobalBasePath you now have to specify that value as true if you want to build off the global base path.
 *  commands: A series of shell commands that you want run in that window.
 *  shouldCloseAfterCommand: tells tmux whether or not to close the window after the commands are complete.
 *  concatenateBasePathToGlobalBasePath: determines whether or not to concatenate the global basePath with the window basePath. Default value is false.
