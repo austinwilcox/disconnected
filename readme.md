@@ -78,6 +78,7 @@ windows:
 *  basePath: This will build on basePath from the parent, so if your basePath in the parent is "~/Software" this one could drill down into the tools folder by suppying "tools" as the option here.
 *  commands: A series of shell commands that you want run in that window.
 *  shouldCloseAfterCommand: tells tmux whether or not to close the window after the commands are complete.
+*  concatenateBasePathToGlobalBasePath: determines whether or not to concatenate the global basePath with the window basePath. Default value is false.
   
 ## TODO
 - [x] Update this so that the name auto defaults to the name of the file.
