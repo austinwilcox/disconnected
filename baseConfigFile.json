@@ -11,6 +11,27 @@
       "concatenateBasePathToGlobalBasePath": false
     },
     {
+      "name": "panes",
+      "basePath": "",
+      "commands": ["ls"],
+      "shouldCloseAfterCommand": false,
+      "concatenateBasePathToGlobalBasePath": false,
+      "panes": [
+        {
+          "commands": ["ls"],
+          "basePath": "",
+          "concatenateBasePathToGlobalBasePath": false,
+          "split": "v"
+        },
+        {
+          "commands": ["ls"],
+          "basePath": "",
+          "concatenateBasePathToGlobalBasePath": false,
+          "split": "h"
+        }
+      ]
+    },
+    {
       "name": "top",
       "basePath": "",
       "commands": ["top"],

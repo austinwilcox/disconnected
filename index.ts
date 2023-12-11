@@ -11,13 +11,23 @@ if (!editor) {
   editor = "nano"
 }
 
+interface IPane {
+  commands: string[];
+  basePath: string;
+  concatenateBasePathToGlobalBasePath: boolean;
+  split: string;
+}
+
 interface IWindow {
   name: string;
   basePath: string;
   commands: string[];
   shouldCloseAfterCommand: boolean;
   concatenateBasePathToGlobalBasePath: boolean;
+  panes: IPane[];
 }
+
+
 
 const baseConfigFile = `{
   "name": "SampleBaseConfig",
@@ -30,6 +40,24 @@ const baseConfigFile = `{
       "commands": ["ls"],
       "shouldCloseAfterCommand": false,
       "concatenateBasePathToGlobalBasePath": false
+    },
+    {
+      "name": "panes",
+      "basePath": "",
+      "commands": ["ls"],
+      "shouldCloseAfterCommand": false,
+      "concatenateBasePathToGlobalBasePath": false,
+      "panes": [
+        {
+          "commands": ["ls"],
+          "basePath": "",
+          "concatenateBasePathToGlobalBasePath": false
+        },
+        {
+          "commands": ["ls"],
+          "basePath": "",
+          "concatenateBasePathToGlobalBasePath": false
+      ]
     },
     {
       "name": "htop",
@@ -83,7 +111,7 @@ const startCommand = new Command()
   const data = decoder.decode(file);
   const configFile = JSON.parse(data.toString());
   const lines = [];
-  const paneNumber = 1;
+  let paneNumber = 1;
   configFile.windows.forEach((window: IWindow, index: number) => {
     if (configFile.basePath.includes("~")) {
       configFile.basePath = configFile.basePath.replace("~", home as string)
@@ -114,6 +142,28 @@ const startCommand = new Command()
 
     if("shouldCloseAfterCommand" in window && window.shouldCloseAfterCommand) {
       lines.push(`tmux send -t ${name}:${windowNumber}.${paneNumber} "exit" C-m`);
+    }
+
+    if("panes" in window) {
+      window.panes.forEach((pane: IPane) => {
+        paneNumber++;
+        console.log(pane, paneNumber)
+        if(pane.concatenateBasePathToGlobalBasePath) {
+          lines.push(
+            `tmux split-window -${pane.split} -t ${name}:${windowNumber}.${paneNumber}`
+          );
+        } else {
+          lines.push(
+            `tmux split-window -${pane.split} -t ${name}:${windowNumber}.${paneNumber}`
+          );
+        }
+        pane.commands.forEach((cmd: string) => {
+          lines.push(`tmux send -t ${name}:${windowNumber}.${paneNumber} "${cmd}" C-m`);
+        });
+        if("shouldCloseAfterCommand" in pane && pane.shouldCloseAfterCommand) {
+          lines.push(`tmux send -t ${name}:${windowNumber}.${paneNumber} "exit" C-m`);
+        }
+      })
     }
   });
   lines.push(`tmux select-window -t ${configFile.startingWindow}`)
