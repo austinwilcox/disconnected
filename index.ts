@@ -147,15 +147,16 @@ const startCommand = new Command()
     if("panes" in window) {
       window.panes.forEach((pane: IPane) => {
         paneNumber++;
-        console.log(pane, paneNumber)
         if(pane.concatenateBasePathToGlobalBasePath) {
           lines.push(
-            `tmux split-window -${pane.split} -t ${name}:${windowNumber}.${paneNumber}`
+            `tmux split-window -${pane.split} -t ${name}:${windowNumber}.${paneNumber-1}`
           );
+          lines.push(`tmux send -t ${name}:${windowNumber}.${paneNumber} "cd ${path.join(configFile.basePath, pane.basePath)}" C-m`)
         } else {
           lines.push(
-            `tmux split-window -${pane.split} -t ${name}:${windowNumber}.${paneNumber}`
+            `tmux split-window -${pane.split} -t ${name}:${windowNumber}.${paneNumber-1}`
           );
+          lines.push(`tmux send -t ${name}:${windowNumber}.${paneNumber} "cd ${pane.basePath}" C-m`)
         }
         pane.commands.forEach((cmd: string) => {
           lines.push(`tmux send -t ${name}:${windowNumber}.${paneNumber} "${cmd}" C-m`);
@@ -165,6 +166,7 @@ const startCommand = new Command()
         }
       })
     }
+    paneNumber = 1
   });
   lines.push(`tmux select-window -t ${configFile.startingWindow}`)
   lines.push(`tmux attach -t ${name} -c ${configFile.basePath}`);
