@@ -91,6 +91,9 @@ const startCommand = new Command()
     if (window.basePath.includes("~")) {
       window.basePath = window.basePath.replace("~", home as string)
     }
+    if(window.name.includes(" ")) {
+      window.name = window.name.replace(" ", "-");
+    }
     const windowNumber = index + 1;
     if (index === 0) {
       lines.push(`tmux new-session -d -s ${name} -n ${window.name}`);
