@@ -40,6 +40,7 @@ jobs:
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          TAG_NAME: ${{ env.TAG_NAME }}
         with:
           tag_name: ${{ env.TAG_NAME }}
           release_name: "Release $env.TAG_NAME" # Replace with your desired release name
