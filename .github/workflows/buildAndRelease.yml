@@ -33,14 +33,13 @@ jobs:
         run: |
           TAG_NAME=${GITHUB_REF#refs/tags/}
           echo "Tag name: $TAG_NAME"
-          echo "tag_name=$TAG_NAME" >> $GITHUB_ENV
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
       
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-          TAG_NAME: ${{ env.TAG_NAME }}
         with:
           tag_name: ${{ env.TAG_NAME }}
           release_name: "Release $env.TAG_NAME" # Replace with your desired release name
