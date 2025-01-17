@@ -8,7 +8,11 @@ const tmuxTest: ITmux = {
   },
   attach: async (name: string) => {
     await Promise.resolve(console.log(`${name}`));
+  },
+  switchClient: async (name: string) => {
+    await Promise.resolve(console.log(`${name}`));
   }
+
 }
 
 Deno.test("Tmux session is currently running the session 'testOutput'", async () => {

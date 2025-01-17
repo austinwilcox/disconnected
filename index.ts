@@ -251,7 +251,7 @@ const editConfigCommand = new Command()
 
 await new Command()
   .name("Disconnected")
-  .version("0.3.0")
+  .version("0.3.1")
   .description(decoder.decode(Deno.readFileSync("./description.md")))
   .action(async (_options, ..._args) => {
     await createNeededDirectoriesAndFiles(
