@@ -41,15 +41,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
-          # TODO: Here I want to pull the current tag name and have that in the release.
           tag_name: ${{ env.TAG_NAME }}
-          release_name: "Release ${{ env.TAG_NAME }}" # Replace with your desired release name
-          body: |
-            Fix Deno.run to Deno.Command as Deno.run is being deprecated. I have resolved the issue where you supply the global basePath as ~/ and the window basePath as ~/ by adding a new key in the json structure called concatenateBasePathToGlobalBasePath. This will prevent issues such as cd ~/~/ being run in the window. 
-
-            Window basePaths can now use relative paths.
-
-            When you attach to the session the -c command is attached which will instantiate all new windows to the global basePath directory you specify in the config file.
+          release_name: "Release $env.TAG_NAME" # Replace with your desired release name
+          body: Working with switch-client and updating action to run on tag push
           draft: false
           prerelease: false
           
