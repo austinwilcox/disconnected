@@ -1,16 +1,9 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# This workflow will install Deno then run `deno lint` and `deno test`.
-# For more information see: https://github.com/denoland/setup-deno
-
 name: Build and Release
 
 on:
   push:
-    branches: ["master"]
+    tags:
+      - '*'
 
 jobs:
   buildAndRun:
@@ -28,13 +21,19 @@ jobs:
         # uses: denoland/setup-deno@v1
         uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31  # v1.1.2
         with:
-          deno-version: v1.36.4
+          deno-version: v2.1.4
 
       - name: Tests
         run: deno test
       
       - name: Build Deno App
         run: deno compile --allow-read --allow-env --allow-write --allow-run --output ./dist/disconnected index.ts
+
+      - name: Extract the tag name
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "Tag name: $TAG_NAME"
+          echo "tag_name=$TAG_NAME" >> $GITHUB_ENV
       
       - name: Create Release
         id: create_release
@@ -42,8 +41,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
-          tag_name: v0.3.0 # Replace with your desired tag name
-          release_name: Release 0.3.0 # Replace with your desired release name
+          # TODO: Here I want to pull the current tag name and have that in the release.
+          tag_name: ${{ env.TAG_NAME }}
+          release_name: "Release ${{ env.TAG_NAME }}" # Replace with your desired release name
           body: |
             Fix Deno.run to Deno.Command as Deno.run is being deprecated. I have resolved the issue where you supply the global basePath as ~/ and the window basePath as ~/ by adding a new key in the json structure called concatenateBasePathToGlobalBasePath. This will prevent issues such as cd ~/~/ being run in the window. 
 
