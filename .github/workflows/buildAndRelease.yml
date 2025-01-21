@@ -42,8 +42,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           tag_name: ${{ env.TAG_NAME }}
-          release_name: "Release ${{env.TAG_NAME}}"
-          body: Working with switch-client and updating action to run on tag push
+          release_name: ${{ env.TAG_NAME }}
+          body: Fix description error when running disconnected outside the disconnected repo.
           draft: false
           prerelease: false
           
