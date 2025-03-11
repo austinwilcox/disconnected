@@ -256,7 +256,7 @@ const editConfigCommand = new Command()
 
 await new Command()
   .name("Disconnected")
-  .version("0.3.2")
+  .version("0.3.3")
   .description(
     `Disconnected is a powerful and versatile application that allows you to manage your terminal sessions with ease. As an alternative to tmuxinator, it offers a simple and intuitive cli that is perfect for both beginners and advanced users. With Disconnected, you can easily create, modify, and manage your terminal sessions with just a few commands.
 
