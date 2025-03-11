@@ -1,21 +1,16 @@
 # Disconnected
-Disconnected is a powerful and versatile application that allows you to manage your tmux sessions with ease. As an alternative to tmuxinator, it offers a simple config setup for users that prefer json over yaml. With Disconnected, you can easily create, modify, and manage your tmux sessions with just a few commands.
-
-One of the key features of Disconnected is its use of a JSON configuration file, which makes it easy to configure and customize your tmux sessions to your liking. Whether you're working on a complex project or just need to manage a few terminals at once, Disconnected makes it easy to get started.
-
-Disconnected is a constantly updated program, it is fully functional in it's 0.2.1 version, but is currently due to change.
+Disconnected is a simple tmux session creator. Using JSON you can specify the windows that you want to run, and what commands to run at start.
 
 ## Setup
-1. To setup Disconnected, ensure that you have [Deno](https://deno.land/manual@v1.31.1/getting_started/installation) installed on your machine.
-NOTE: Disconnected will only work on Mac or Linux, and ~~currently only works for NVIM users~~ now works for all users who have the $EDITOR env variable set.
+1. To setup Disconnected, ensure that you have Deno installed on your machine.
 2. Run the following command
 ```bash
-deno compile --allow-read --allow-env --allow-write --allow-run --output disconnected index.ts
+deno compile --allow-read --allow-env --allow-write --allow-run --output ./dist/disconnected index.ts
 ```
 or you can download the most recent release in the releases.
 3. This will generate a disconnected executable that you can run on your machine. You can add this directory to your path, or toss it in the bin folder with your shell.
 ```bash
-cp disconnected /usr/local/bin
+cp ./dist/disconnected /usr/local/bin
 ```
 NOTE: Depending on your user permissions you may need to run this with sudo.
 3. After you have disconnected added to path run
@@ -84,6 +79,4 @@ windows:
 - [x] Update this so that the name auto defaults to the name of the file.
 - [ ] Support panes in the future.
 - [ ] Do some name validation here to ensure no spaces are in the name
-- [ ] Improve the text validation for attaching to a service that has already been started (currently it's a simple includes)
-- [ ] Disconnected update - auto pull the new executable and place it in the correct path area. This will pull from github releases the new version of the application.
-- [ ] Ability to send key input to several windows/panes at a time, an example command would be this:  ```tmux send-keys -t arbPortal:API:NVIM 'git pull' Enter && tmux send-keys -t arbPortal:Portal:NVIM 'git pull' Enter && tmux send-keys -t arbPortal:Lib:NVIM 'git pull' Enter```, I would love to be able to run ```disconnected send-actions 4-6 'git pull' Enter``` or something like ```disconnected send-actions arbPortal 4-6 'git pull' Enter``` for something like the connected session I can pass in the flag -c so it would look like this if you want to run it on the connected session: ```disconnected send-actions -c 4-6 'git pull' Enter``` and this would run it on the currently attached tmux session, but this makes some assumption that you are using disconnected as your default way to manage tmux, which may not always be the case, but I suppose it does not matter because tmux will still run all the commands you send.
+- [x] Improve the text validation for attaching to a service that has already been started (currently it's a simple includes)
