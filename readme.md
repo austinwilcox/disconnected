@@ -62,7 +62,6 @@ Here is the sample config file that is generated for you
 }
 ```
 name: This will be the name of the tmux session 
-<!-- TODO: Update this so that the name auto defaults to the name of the file. -->
 
 basePath: This will be the base path for your project you are working in.
 
