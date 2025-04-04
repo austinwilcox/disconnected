@@ -13,6 +13,7 @@ or you can download the most recent release in the releases.
 cp ./dist/disconnected /usr/local/bin
 ```
 NOTE: Depending on your user permissions you may need to run this with sudo.
+
 3. After you have disconnected added to path run
 ```bash
 disconnected
@@ -22,12 +23,14 @@ or
 disconnected init
 ```
 This will create the necessary folders and files in the ~/.config/disconnected folder so that disconnected can save settings.
+
 4. Create a new config file with 
 ```bash
 disconnected new NameOfService
 ```
 with nameOfService being whatever you would like to call the config file
 <!-- TODO: Do some name validation here to ensure no spaces are in the name -->
+
 5. You'll be presented with a json file in your editor of choice that you can modify and edit to setup your sessions.
 
 ## Build from source
