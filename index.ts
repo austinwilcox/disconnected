@@ -44,11 +44,6 @@ const baseConfigFile = `{
   ]
 }`;
 
-//const testCommand = new Command()
-//.description(`TEST`)
-//.action(() => {
-//})
-
 const initCommand = new Command()
   .description(
     `Create all the files and folders needed to run disconnected. Files will be placed in ${basePathToDisconnectedDirectory}`,
@@ -64,9 +59,6 @@ const startCommand = new Command()
   .arguments("<name:string>")
   .description("Start tmux with the supplied config file name.")
   .action(async (_options, name: string) => {
-    const pathToBashScriptFile =
-      `${basePathToDisconnectedDirectory}/bashScripts/${name}.sh`;
-
     let doesFileExist = false;
     for await (
       const dirEntry of Deno.readDir(
@@ -161,15 +153,10 @@ const startCommand = new Command()
       }`,
     );
 
-    await Deno.writeTextFile(pathToBashScriptFile, lines.join("\n"));
-    await Deno.chmod(pathToBashScriptFile, 0o777);
+    const runTmuxCommand = new Deno.Command(shell, { args: [ "-c", lines.join("\n") ] });
+    runTmuxCommand.spawn();
 
-    const executeFile = new Deno.Command(shell, {
-      args: [`${pathToBashScriptFile}`],
-    });
-    executeFile.spawn();
-
-    console.log("Run following command to attach to tmux session.");
+    console.log("Run the following command to attach to the newly created tmux session:");
     console.log(`tmux a -t ${name}`);
   });
 
@@ -219,13 +206,6 @@ const createNewConfigCommand = new Command()
     p.spawn();
   });
 
-// const deleteConfigCommand = new Command()
-// .arguments("<name:string>")
-// .description("Delete the config file")
-// .action(( _options, name: string ) => {
-//   console.log(`You have hit the delete command with ${name}`)
-// })
-
 const editConfigCommand = new Command()
   .arguments("<name:string>")
   .description("Edit the config file")
@@ -256,11 +236,9 @@ const editConfigCommand = new Command()
 
 await new Command()
   .name("Disconnected")
-  .version("0.3.3")
+  .version("0.3.4")
   .description(
-    `Disconnected is a powerful and versatile application that allows you to manage your terminal sessions with ease. As an alternative to tmuxinator, it offers a simple and intuitive cli that is perfect for both beginners and advanced users. With Disconnected, you can easily create, modify, and manage your terminal sessions with just a few commands.
-
-One of the key features of Disconnected is its use of a JSON configuration file, which makes it easy to configure and customize your terminal sessions to your liking. Whether you're working on a complex project or just need to manage a few terminals at once, Disconnected makes it easy to get started.`,
+    "Disconnected is a simple tmux session creator. Using JSON you can specify how many windows you want, and what commands to run in each of those windows.",
   )
   .action(async (_options, ..._args) => {
     await createNeededDirectoriesAndFiles(
@@ -272,7 +250,5 @@ One of the key features of Disconnected is its use of a JSON configuration file,
   .command("start", startCommand)
   .command("list", listCommand)
   .command("new", createNewConfigCommand)
-  // .command("delete", deleteConfigCommand)
   .command("edit", editConfigCommand)
-  // .command("test", testCommand)
   .parse(Deno.args);

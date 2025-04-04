@@ -1,5 +1,5 @@
 # Disconnected
-Disconnected is a simple tmux session creator. Using JSON you can specify the windows that you want to run, and what commands to run at start.
+Disconnected is a simple tmux session creator. Using JSON you can specify how many windows you want, and what commands to run in each of those windows.
 
 ## Setup
 1. To setup Disconnected, ensure that you have Deno installed on your machine.
@@ -78,5 +78,5 @@ windows:
 ## TODO
 - [x] Update this so that the name auto defaults to the name of the file.
 - [ ] Support panes in the future.
-- [ ] Do some name validation here to ensure no spaces are in the name
+- [x] Do some name validation here to ensure no spaces are in the name
 - [x] Improve the text validation for attaching to a service that has already been started (currently it's a simple includes)
