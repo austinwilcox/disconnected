@@ -11,9 +11,6 @@ export const createNeededDirectoriesAndFiles = async function(basePathToDisconne
       return;
     }
 
-    await Deno.mkdir(basePath, { recursive: true })
-    await Deno.mkdir(`${basePathToDisconnectedDirectory}/bashScripts`, { recursive: true })
-
     const encoder = new TextEncoder();
     const data = encoder.encode(baseConfigFile)
     Deno.writeFileSync(`${basePath}/baseConfig.json`, data)
