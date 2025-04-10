@@ -153,10 +153,14 @@ const startCommand = new Command()
       }`,
     );
 
-    const runTmuxCommand = new Deno.Command(shell, { args: [ "-c", lines.join("\n") ] });
+    const runTmuxCommand = new Deno.Command(shell, {
+      args: ["-c", lines.join("\n")],
+    });
     runTmuxCommand.spawn();
 
-    console.log("Run the following command to attach to the newly created tmux session:");
+    console.log(
+      "Run the following command to attach to the newly created tmux session:",
+    );
     console.log(`tmux a -t ${name}`);
   });
 
@@ -234,6 +238,15 @@ const editConfigCommand = new Command()
     p.spawn();
   });
 
+const rmConfigCommand = new Command()
+  .arguments("<name:string>")
+  .description("Delete the config file")
+  .action(async (_options, name: string) => {
+    await Deno.remove(
+      path.join(basePathToDisconnectedDirectory, `${name}.json`),
+    );
+  });
+
 await new Command()
   .name("Disconnected")
   .version("0.3.4")
@@ -251,4 +264,5 @@ await new Command()
   .command("list", listCommand)
   .command("new", createNewConfigCommand)
   .command("edit", editConfigCommand)
+  .command("rm", rmConfigCommand)
   .parse(Deno.args);
