@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - '*'
+      - "*"
 
 jobs:
   buildAndRun:
@@ -19,13 +19,13 @@ jobs:
 
       - name: Setup Deno
         # uses: denoland/setup-deno@v1
-        uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31  # v1.1.2
+        uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31 # v1.1.2
         with:
           deno-version: v2.1.4
 
       - name: Tests
         run: deno test
-      
+
       - name: Build Deno App
         run: deno compile --allow-read --allow-env --allow-write --allow-run --output ./dist/disconnected index.ts
 
@@ -34,7 +34,7 @@ jobs:
           TAG_NAME=${GITHUB_REF#refs/tags/}
           echo "Tag name: $TAG_NAME"
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
-      
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -46,7 +46,7 @@ jobs:
           body: Fix description error when running disconnected outside the disconnected repo.
           draft: false
           prerelease: false
-          
+
       - name: Upload Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1

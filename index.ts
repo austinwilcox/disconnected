@@ -60,11 +60,16 @@ const startCommand = new Command()
   .description("Start tmux with the supplied config file name.")
   .action(async (_options, name: string) => {
     let doesFileExist = false;
+    //TODO: There is no need to use a promise here, I should just read the directory synchonously.
+    //I could probably remove most promises from the code base here.
     for await (
       const dirEntry of Deno.readDir(
         basePathToDisconnectedDirectory,
       )
     ) {
+      //BUG: This should not be includes, but I should do a case insensitive check here
+      //This presents a bug if I want to create a config file with the name of "r" and I
+      //have an existing config file that has the letter r in it
       if (dirEntry.name.includes(name)) {
         doesFileExist = true;
         break;

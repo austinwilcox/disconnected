@@ -2,8 +2,10 @@
 Disconnected is a simple tmux session creator. Using JSON you can specify how many windows you want, and what commands to run in each of those windows.
 
 ## Setup
+
 1. To setup Disconnected, ensure that you have Deno installed on your machine.
 2. Run the following command
+
 ```bash
 deno compile --allow-read --allow-env --allow-write --allow-run --output ./dist/disconnected index.ts
 ```
@@ -19,7 +21,9 @@ NOTE: Depending on your user permissions you may need to run this with sudo.
 ```bash
 disconnected
 ```
+
 or
+
 ```bash
 disconnected init
 ```
@@ -29,19 +33,24 @@ This will create the necessary folders and files in the ~/.config/disconnected f
 ```bash
 disconnected new NameOfService
 ```
+
 with nameOfService being whatever you would like to call the config file
+
 <!-- TODO: Do some name validation here to ensure no spaces are in the name -->
 
 6. You'll be presented with a json file in your editor of choice that you can modify and edit to setup your sessions.
 
 ## Build from source
+
 ```
 deno compile --allow-read --allow-env --allow-write --allow-run --output ./dist/disconnected index.ts
 chmod +x ./dist/disconnected
 ```
 
 ## The Config File
+
 Here is the sample config file that is generated for you
+
 ```
 {
   "name": "SampleBaseConfig",
@@ -79,6 +88,7 @@ windows:
 *  concatenateBasePathToGlobalBasePath: determines whether or not to concatenate the global basePath with the window basePath. Default value is false.
   
 ## TODO
+
 - [x] Update this so that the name auto defaults to the name of the file.
 - [ ] Support panes in the future.
 - [x] Do some name validation here to ensure no spaces are in the name

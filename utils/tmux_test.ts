@@ -11,17 +11,15 @@ const tmuxTest: ITmux = {
   },
   switchClient: async (name: string) => {
     await Promise.resolve(console.log(`${name}`));
-  }
-
-}
+  },
+};
 
 Deno.test("Tmux session is currently running the session 'testOutput'", async () => {
-  const response = await isTmuxSessionCurrentlyRunning(tmuxTest, "testOutput")
+  const response = await isTmuxSessionCurrentlyRunning(tmuxTest, "testOutput");
   assertEquals(response, true);
 });
 
-
 Deno.test("Tmux session is NOT currently running the session 'testing'", async () => {
-  const response = await isTmuxSessionCurrentlyRunning(tmuxTest, "testing")
+  const response = await isTmuxSessionCurrentlyRunning(tmuxTest, "testing");
   assertEquals(response, false);
 });
