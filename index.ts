@@ -1,7 +1,10 @@
 import { Command } from "https://deno.land/x/cliffy@v0.25.2/command/mod.ts";
 import * as path from "https://deno.land/std@0.167.0/path/mod.ts";
 import { createNeededDirectoriesAndFiles } from "./startup.ts";
-import { isTmuxSessionCurrentlyRunning } from "./utils/index.ts";
+import {
+  doesConfigFileExist,
+  isTmuxSessionCurrentlyRunning,
+} from "./utils/index.ts";
 import { Tmux } from "./utils/tmux.ts";
 
 const home = Deno.env.get("HOME");
@@ -59,24 +62,10 @@ const startCommand = new Command()
   .arguments("<name:string>")
   .description("Start tmux with the supplied config file name.")
   .action(async (_options, name: string) => {
-    let doesFileExist = false;
-    //TODO: There is no need to use a promise here, I should just read the directory synchonously.
-    //I could probably remove most promises from the code base here.
-    for await (
-      const dirEntry of Deno.readDir(
-        basePathToDisconnectedDirectory,
-      )
+    if (
+      doesConfigFileExist(name) ===
+        false
     ) {
-      //BUG: This should not be includes, but I should do a case insensitive check here
-      //This presents a bug if I want to create a config file with the name of "r" and I
-      //have an existing config file that has the letter r in it
-      if (dirEntry.name.includes(name)) {
-        doesFileExist = true;
-        break;
-      }
-    }
-
-    if (doesFileExist == false) {
       console.log(`Could not find config file for ${name}`);
       console.log(`Did you mean to run: disconnected new ${name}?`);
       return;
@@ -91,7 +80,7 @@ const startCommand = new Command()
       return;
     }
 
-    const file = await Deno.readFile(
+    const file = Deno.readFileSync(
       `${basePathToDisconnectedDirectory}/${name}.json`,
     );
 
@@ -190,17 +179,11 @@ const listCommand = new Command()
 const createNewConfigCommand = new Command()
   .arguments("<name:string>")
   .description("Create the config file")
-  .action(async (_options, name: string) => {
-    for await (
-      const dirEntry of Deno.readDir(
-        basePathToDisconnectedDirectory,
-      )
-    ) {
-      if (dirEntry.name.includes(name)) {
-        console.log(`File already exists with name: ${name}`);
-        console.log(`Did you mean to run: disconnected edit ${name}?`);
-        return;
-      }
+  .action((_options, name: string) => {
+    if (doesConfigFileExist(name)) {
+      console.log(`File already exists with name: ${name}`);
+      console.log(`Did you mean to run: disconnected edit ${name}?`);
+      return;
     }
 
     const encoder = new TextEncoder();
@@ -218,20 +201,8 @@ const createNewConfigCommand = new Command()
 const editConfigCommand = new Command()
   .arguments("<name:string>")
   .description("Edit the config file")
-  .action(async (_options, name: string) => {
-    let doesTheDirectoryContainTheFile = false;
-    for await (
-      const dirEntry of Deno.readDir(
-        basePathToDisconnectedDirectory,
-      )
-    ) {
-      if (dirEntry.name.includes(name)) {
-        doesTheDirectoryContainTheFile = true;
-        break;
-      }
-    }
-
-    if (doesTheDirectoryContainTheFile === false) {
+  .action((_options, name: string) => {
+    if (doesConfigFileExist(name) === false) {
       console.log(`Could not find config file for ${name}`);
       console.log(`Did you mean to run: disconnected new ${name}?`);
       return;
@@ -246,15 +217,13 @@ const editConfigCommand = new Command()
 const rmConfigCommand = new Command()
   .arguments("<name:string>")
   .description("Delete the config file")
-  .action(async (_options, name: string) => {
-    await Deno.remove(
-      path.join(basePathToDisconnectedDirectory, `${name}.json`),
-    );
+  .action((_options, name: string) => {
+    Deno.removeSync(path.join(basePathToDisconnectedDirectory, `${name}.json`));
   });
 
 await new Command()
   .name("Disconnected")
-  .version("0.3.4")
+  .version("0.3.5")
   .description(
     "Disconnected is a simple tmux session creator. Using JSON you can specify how many windows you want, and what commands to run in each of those windows.",
   )
