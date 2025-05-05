@@ -5,7 +5,7 @@ import {
   doesConfigFileExist,
   isTmuxSessionCurrentlyRunning,
 } from "./utils/index.ts";
-import { Tmux } from "./utils/tmux.ts";
+import { Tmux, TmuxBuilder } from "./utils/tmux.ts";
 
 const home = Deno.env.get("HOME");
 const isInTmux = Deno.env.get("TERM_PROGRAM")?.includes("tmux");
@@ -88,6 +88,8 @@ const startCommand = new Command()
     const configFile = JSON.parse(data.toString());
     const lines = [];
     const paneNumber = 1; //NOTE: Read from a .tmux.conf file and see if they start at 1, because some people may not
+    const tmuxBuilder = new TmuxBuilder();
+    tmuxBuilder.dryRun();
     configFile.windows.forEach((window: IWindow, index: number) => {
       if (!window.name) {
         const error = `Window name is required for window ${index + 1}`;
@@ -105,8 +107,10 @@ const startCommand = new Command()
       }
       const windowNumber = index + 1;
       if (index === 0) {
+        tmuxBuilder.newSession(name, configFile.basePath);
         lines.push(`tmux new-session -d -s ${name} -n ${window.name}`);
       } else {
+        tmuxBuilder.newWindow(name, { startDirectory: configFile.basePath });
         lines.push(`tmux neww -t ${name} -n "${window.name}"`);
       }
 

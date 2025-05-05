@@ -89,6 +89,7 @@ windows:
   
 ## TODO
 
+- [ ] When I run `dsc list` it would nice to know which of those sessions are running.
 - [x] Update this so that the name auto defaults to the name of the file.
 - [ ] Support panes in the future.
 - [x] Do some name validation here to ensure no spaces are in the name
