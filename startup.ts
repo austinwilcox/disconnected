@@ -14,6 +14,7 @@ export const createNeededDirectoriesAndFiles = async function (
       return;
     }
 
+    Deno.mkdirSync(basePath, { recursive: true });
     const encoder = new TextEncoder();
     const data = encoder.encode(baseConfigFile);
     Deno.writeFileSync(`${basePath}/baseConfig.json`, data);
