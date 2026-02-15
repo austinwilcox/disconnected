@@ -17,12 +17,21 @@ if (!editor) {
 }
 const decoder = new TextDecoder("utf-8");
 
+interface IPane {
+  split: string;
+  basePath: string;
+  commands: string[];
+  shouldCloseAfterCommand: boolean;
+  concatenateBasePathToGlobalBasePath: boolean;
+}
+
 interface IWindow {
   name: string;
   basePath: string;
   commands: string[];
   shouldCloseAfterCommand: boolean;
   concatenateBasePathToGlobalBasePath: boolean;
+  panes?: IPane[];
 }
 
 const baseConfigFile = `{
@@ -42,7 +51,16 @@ const baseConfigFile = `{
       "basePath": "",
       "commands": ["htop"],
       "shouldCloseAfterCommand": true,
-      "concatenateBasePathToGlobalBasePath": false
+      "concatenateBasePathToGlobalBasePath": false,
+      "panes": [
+        {
+          "split": "horizontal",
+          "basePath": "",
+          "commands": ["echo hello from pane 2"],
+          "shouldCloseAfterCommand": false,
+          "concatenateBasePathToGlobalBasePath": false
+        }
+      ]
     }
   ]
 }`;
@@ -87,7 +105,6 @@ const startCommand = new Command()
     const data = decoder.decode(file);
     const configFile = JSON.parse(data.toString());
     const lines = [];
-    const paneNumber = 1; //NOTE: Read from a .tmux.conf file and see if they start at 1, because some people may not
     const tmuxBuilder = new TmuxBuilder();
     tmuxBuilder.dryRun();
     configFile.windows.forEach((window: IWindow, index: number) => {
@@ -106,6 +123,7 @@ const startCommand = new Command()
         window.name = window.name.replace(" ", "-");
       }
       const windowNumber = index + 1;
+      const windowPaneNumber = 1;
       if (index === 0) {
         tmuxBuilder.newSession(name, configFile.basePath);
         lines.push(`tmux new-session -d -s ${name} -n ${window.name}`);
@@ -116,7 +134,7 @@ const startCommand = new Command()
 
       if (window.concatenateBasePathToGlobalBasePath) {
         lines.push(
-          `tmux send -t ${name}:${windowNumber}.${paneNumber} "cd ${
+          `tmux send -t ${name}:${windowNumber}.${windowPaneNumber} "cd ${
             path.join(
               configFile.basePath,
               window.basePath,
@@ -125,13 +143,13 @@ const startCommand = new Command()
         );
       } else {
         lines.push(
-          `tmux send -t ${name}:${windowNumber}.${paneNumber} "cd ${window.basePath}" C-m`,
+          `tmux send -t ${name}:${windowNumber}.${windowPaneNumber} "cd ${window.basePath}" C-m`,
         );
       }
 
       window.commands.forEach((cmd: string) => {
         lines.push(
-          `tmux send -t ${name}:${windowNumber}.${paneNumber} "${cmd}" C-m`,
+          `tmux send -t ${name}:${windowNumber}.${windowPaneNumber} "${cmd}" C-m`,
         );
       });
 
@@ -140,8 +158,55 @@ const startCommand = new Command()
         window.shouldCloseAfterCommand
       ) {
         lines.push(
-          `tmux send -t ${name}:${windowNumber}.${paneNumber} "exit" C-m`,
+          `tmux send -t ${name}:${windowNumber}.${windowPaneNumber} "exit" C-m`,
         );
+      }
+
+      if (window.panes) {
+        let paneCounter = 2;
+        window.panes.forEach((pane: IPane) => {
+          const splitFlag = pane.split === "horizontal" ? "-h" : "-v";
+          lines.push(
+            `tmux split-window ${splitFlag} -t ${name}:${windowNumber}`,
+          );
+
+          let panePath = pane.basePath;
+          if (panePath.includes("~")) {
+            panePath = panePath.replace("~", home as string);
+          }
+
+          if (pane.concatenateBasePathToGlobalBasePath) {
+            lines.push(
+              `tmux send -t ${name}:${windowNumber}.${paneCounter} "cd ${
+                path.join(
+                  configFile.basePath,
+                  panePath,
+                )
+              }" C-m`,
+            );
+          } else if (panePath) {
+            lines.push(
+              `tmux send -t ${name}:${windowNumber}.${paneCounter} "cd ${panePath}" C-m`,
+            );
+          }
+
+          pane.commands.forEach((cmd: string) => {
+            lines.push(
+              `tmux send -t ${name}:${windowNumber}.${paneCounter} "${cmd}" C-m`,
+            );
+          });
+
+          if (
+            "shouldCloseAfterCommand" in pane &&
+            pane.shouldCloseAfterCommand
+          ) {
+            lines.push(
+              `tmux send -t ${name}:${windowNumber}.${paneCounter} "exit" C-m`,
+            );
+          }
+
+          paneCounter++;
+        });
       }
     });
     lines.push(`tmux select-window -t ${configFile.startingWindow}`);

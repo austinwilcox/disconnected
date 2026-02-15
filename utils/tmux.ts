@@ -88,6 +88,12 @@ export class TmuxBuilder {
     return this;
   }
 
+  splitWindow(target: string, direction: 'h' | 'v', startDirectory?: string): this {
+    const path = startDirectory ? `-c ${this.escape(startDirectory)}` : '';
+    this.commands.push(`split-window -${direction} -t ${this.escape(target)} ${path}`);
+    return this;
+  }
+
   killWindow(name: string): this {
     const target = this.windowTargets.get(name) ?? name;
     this.commands.push(`kill-window -t ${this.escape(target)}`);

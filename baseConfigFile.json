@@ -11,11 +11,20 @@
       "concatenateBasePathToGlobalBasePath": false
     },
     {
-      "name": "top",
+      "name": "htop",
       "basePath": "",
-      "commands": ["top"],
+      "commands": ["htop"],
       "shouldCloseAfterCommand": true,
-      "concatenateBasePathToGlobalBasePath": false
+      "concatenateBasePathToGlobalBasePath": false,
+      "panes": [
+        {
+          "split": "horizontal",
+          "basePath": "",
+          "commands": ["echo hello from pane 2"],
+          "shouldCloseAfterCommand": false,
+          "concatenateBasePathToGlobalBasePath": false
+        }
+      ]
     }
   ]
 }
