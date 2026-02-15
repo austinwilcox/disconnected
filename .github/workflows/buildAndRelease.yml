@@ -10,12 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
       - name: Setup repo
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup Deno
         # uses: denoland/setup-deno@v1
@@ -35,6 +37,20 @@ jobs:
           echo "Tag name: $TAG_NAME"
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
 
+      - name: Generate changelog
+        run: |
+          PREVIOUS_TAG=$(git tag --sort=-creatordate | grep -v "^${TAG_NAME}$" | head -n 1)
+          if [ -z "$PREVIOUS_TAG" ]; then
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" ${TAG_NAME})
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" ${PREVIOUS_TAG}..${TAG_NAME})
+          fi
+          echo "PREVIOUS_TAG=$PREVIOUS_TAG" >> $GITHUB_ENV
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "CHANGELOG<<$EOF" >> $GITHUB_ENV
+          echo "$CHANGELOG" >> $GITHUB_ENV
+          echo "$EOF" >> $GITHUB_ENV
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -43,7 +59,10 @@ jobs:
         with:
           tag_name: ${{ env.TAG_NAME }}
           release_name: ${{ env.TAG_NAME }}
-          body: Fix description error when running disconnected outside the disconnected repo.
+          body: |
+            ## Changes since ${{ env.PREVIOUS_TAG }}
+
+            ${{ env.CHANGELOG }}
           draft: false
           prerelease: false
 
