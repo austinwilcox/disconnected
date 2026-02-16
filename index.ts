@@ -292,7 +292,7 @@ const rmConfigCommand = new Command()
 
 await new Command()
   .name("Disconnected")
-  .version("0.3.5")
+  .version("0.4.0")
   .description(
     "Disconnected is a simple tmux session creator. Using JSON you can specify how many windows you want, and what commands to run in each of those windows.",
   )
