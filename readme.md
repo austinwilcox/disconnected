@@ -29,7 +29,7 @@ disconnected init
 ```
 This will create the necessary folders and files in the ~/.config/disconnected folder so that disconnected can save settings.
 
-5. Create a new config file with 
+5. Create a new config file with
 ```bash
 disconnected new NameOfService
 ```
@@ -40,12 +40,39 @@ with nameOfService being whatever you would like to call the config file
 
 6. You'll be presented with a json file in your editor of choice that you can modify and edit to setup your sessions.
 
+## Recommended tmux Config
+
+To have new splits open in the current pane's directory, add the following to your `~/.tmux.conf`:
+
+```
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+```
+
+Then reload your config:
+
+```bash
+tmux source-file ~/.tmux.conf
+```
+
 ## Build from source
 
 ```
 deno compile --allow-read --allow-env --allow-write --allow-run --output ./dist/disconnected index.ts
 chmod +x ./dist/disconnected
 ```
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `disconnected init` | Create config directory and files |
+| `disconnected start <name>` | Start or attach to a tmux session from a config file |
+| `disconnected list` | List all config files |
+| `disconnected new <name>` | Create a new config file (opens in editor) |
+| `disconnected edit <name>` | Edit an existing config file |
+| `disconnected rm <name>` | Delete a config file |
+| `disconnected capture <session> [outputName]` | Capture a running tmux session into a config file |
 
 ## The Config File
 
@@ -74,7 +101,7 @@ Here is the sample config file that is generated for you
   ]
 }
 ```
-name: This will be the name of the tmux session 
+name: This will be the name of the tmux session
 
 basePath: This will be the base path for your project you are working in.
 
@@ -86,11 +113,52 @@ windows:
 *  commands: A series of shell commands that you want run in that window.
 *  shouldCloseAfterCommand: tells tmux whether or not to close the window after the commands are complete.
 *  concatenateBasePathToGlobalBasePath: determines whether or not to concatenate the global basePath with the window basePath. Default value is false.
-  
+*  panes: An optional array of panes to create within the window (see Pane Support below).
+
+## Pane Support
+
+Windows can contain panes by adding a `panes` array to a window config:
+
+```json
+{
+  "name": "mywindow",
+  "basePath": "~/Software/myproject",
+  "commands": [],
+  "shouldCloseAfterCommand": false,
+  "concatenateBasePathToGlobalBasePath": false,
+  "panes": [
+    {
+      "splitDirection": "horizontal",
+      "basePath": "",
+      "commands": ["npm run dev"],
+      "shouldCloseAfterCommand": false
+    },
+    {
+      "splitDirection": "vertical",
+      "basePath": "",
+      "commands": ["npm run test:watch"],
+      "shouldCloseAfterCommand": false
+    }
+  ]
+}
+```
+
+`splitDirection` accepts `"horizontal"` or `"vertical"`.
+
+## Capture Command
+
+The `capture` command lets you convert a running tmux session into a disconnected config file:
+
+```bash
+disconnected capture <session-name> [output-name]
+```
+
+This will inspect the running session, record window names, working directories, pane layouts, and active commands, then save the result as a JSON config file in `~/.config/disconnected`. Useful for saving a session you built manually so you can recreate it later.
+
 ## TODO
 
 - [ ] When I run `dsc list` it would nice to know which of those sessions are running.
 - [x] Update this so that the name auto defaults to the name of the file.
-- [ ] Support panes in the future.
+- [x] Support panes in the future.
 - [x] Do some name validation here to ensure no spaces are in the name
 - [x] Improve the text validation for attaching to a service that has already been started (currently it's a simple includes)
