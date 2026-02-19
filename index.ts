@@ -290,6 +290,122 @@ const rmConfigCommand = new Command()
     Deno.removeSync(path.join(basePathToDisconnectedDirectory, `${name}.json`));
   });
 
+const SHELLS = ["bash", "zsh", "sh", "fish", "tcsh", "csh", "ksh"];
+const SEP = "\x1f"; // ASCII unit separator — safe to use as a field delimiter
+
+async function tmuxQuery(args: string[]): Promise<string> {
+  const cmd = new Deno.Command("tmux", { args });
+  const { stdout, stderr, success } = await cmd.output();
+  if (!success) {
+    const errMsg = new TextDecoder().decode(stderr).trim();
+    throw new Error(`tmux error: ${errMsg}`);
+  }
+  return new TextDecoder().decode(stdout).trim();
+}
+
+const captureCommand = new Command()
+  .arguments("<session:string> [outputName:string]")
+  .description(
+    "Capture a running tmux session and generate a disconnected config file. " +
+    "Saves window/pane layout, working directories, and currently running commands.",
+  )
+  .action(async (_options, session: string, outputName?: string) => {
+    const configName = outputName ?? session;
+
+    if (doesConfigFileExist(configName)) {
+      console.log(`Config already exists: ${configName}`);
+      console.log(`Did you mean to run: disconnected edit ${configName}?`);
+      return;
+    }
+
+    // Verify session exists
+    let windowsRaw: string;
+    try {
+      windowsRaw = await tmuxQuery([
+        "list-windows", "-t", session, "-F",
+        `#{window_index}${SEP}#{window_name}`,
+      ]);
+    } catch (err) {
+      console.error(`Could not find tmux session "${session}".`);
+      console.error((err as Error).message);
+      return;
+    }
+
+    const windows = windowsRaw.split("\n").filter(Boolean).map((line) => {
+      const [index, name] = line.split(SEP);
+      return { index, name };
+    });
+
+    const windowConfigs: IWindow[] = [];
+
+    for (const window of windows) {
+      const panesRaw = await tmuxQuery([
+        "list-panes", "-t", `${session}:${window.index}`,
+        "-F",
+        `#{pane_index}${SEP}#{pane_current_path}${SEP}#{pane_current_command}${SEP}#{pane_top}${SEP}#{pane_left}`,
+      ]);
+
+      const panes = panesRaw.split("\n").filter(Boolean).map((line) => {
+        const parts = line.split(SEP);
+        return {
+          index: parts[0],
+          currentPath: parts[1],
+          currentCommand: parts[2],
+          top: parseInt(parts[3]),
+          left: parseInt(parts[4]),
+        };
+      });
+
+      if (panes.length === 0) continue;
+
+      const paneCommands = (pane: typeof panes[0]): string[] => {
+        if (SHELLS.includes(pane.currentCommand)) return [];
+        return [pane.currentCommand];
+      };
+
+      // Infer split direction by comparing pane top position to the first pane.
+      // Same top → side-by-side → horizontal split. Different top → vertical split.
+      const splitDirection = (
+        firstPane: typeof panes[0],
+        pane: typeof panes[0],
+      ): string => pane.top === firstPane.top ? "horizontal" : "vertical";
+
+      const [firstPane, ...restPanes] = panes;
+
+      const windowConfig: IWindow = {
+        name: window.name,
+        basePath: firstPane.currentPath,
+        commands: paneCommands(firstPane),
+        shouldCloseAfterCommand: false,
+        concatenateBasePathToGlobalBasePath: false,
+      };
+
+      if (restPanes.length > 0) {
+        windowConfig.panes = restPanes.map((pane) => ({
+          split: splitDirection(firstPane, pane),
+          basePath: pane.currentPath,
+          commands: paneCommands(pane),
+          shouldCloseAfterCommand: false,
+          concatenateBasePathToGlobalBasePath: false,
+        }));
+      }
+
+      windowConfigs.push(windowConfig);
+    }
+
+    const config = {
+      name: configName,
+      basePath: "~/",
+      startingWindow: "1",
+      windows: windowConfigs,
+    };
+
+    const outputPath = `${basePathToDisconnectedDirectory}/${configName}.json`;
+    const encoder = new TextEncoder();
+    Deno.writeFileSync(outputPath, encoder.encode(JSON.stringify(config, null, 2)));
+    console.log(`Config captured and saved to: ${outputPath}`);
+  });
+
 await new Command()
   .name("Disconnected")
   .version("0.4.0")
@@ -308,4 +424,5 @@ await new Command()
   .command("new", createNewConfigCommand)
   .command("edit", editConfigCommand)
   .command("rm", rmConfigCommand)
+  .command("capture", captureCommand)
   .parse(Deno.args);
